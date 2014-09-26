@@ -1,0 +1,2 @@
+-R . LesniewskiMereology
+mereo_setoidsv12.v
