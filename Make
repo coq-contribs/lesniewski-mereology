@@ -1,2 +1,2 @@
 -R . LesniewskiMereology
-mereo_setoidsv12.v
+mereo_core3.v
