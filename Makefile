@@ -80,7 +80,8 @@ endif
 #                    #
 ######################
 
-VFILES:=mereo_core3.v
+VFILES:=mereo_core4.v\
+  DOLCE_root.v
 
 -include $(addsuffix .d,$(VFILES))
 .SECONDARY: $(addsuffix .d,$(VFILES))
@@ -91,6 +92,9 @@ VIFILES:=$(VFILES:.v=.vi)
 GFILES:=$(VFILES:.v=.g)
 HTMLFILES:=$(VFILES:.v=.html)
 GHTMLFILES:=$(VFILES:.v=.g.html)
+OBJFILES=$(call vo_to_obj,$(VOFILES))
+ALLNATIVEFILES=$(OBJFILES:.o=.cmi) $(OBJFILES:.o=.cmo) $(OBJFILES:.o=.cmx) $(OBJFILES:.o=.cmxs)
+NATIVEFILES=$(foreach f, $(ALLNATIVEFILES), $(wildcard $f))
 ifeq '$(HASNATDYNLINK)' 'true'
 HASNATDYNLINK_OR_EMPTY := yes
 else
@@ -171,7 +175,10 @@ clean:
 	rm -f all.ps all-gal.ps all.pdf all-gal.pdf all.glob $(VFILES:.v=.glob) $(VFILES:.v=.tex) $(VFILES:.v=.g.tex) all-mli.tex
 	- rm -rf html mlihtml
 
-archclean:
+cleanall:: clean
+	rm -f $(patsubst %.v,.%.aux,$(VFILES))
+
+archclean::
 	rm -f *.cmx *.o
 
 printenv:
