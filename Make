@@ -1,2 +1,3 @@
 -R . LesniewskiMereology
-mereo_core3.v
+DOLCE_root.v
+mereo_core4.v
