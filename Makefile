@@ -19,7 +19,6 @@
 
 .DEFAULT_GOAL := all
 
-# 
 # This Makefile may take arguments passed as environment variables:
 # COQBIN to specify the directory where Coq binaries resides;
 # TIMECMD set a command to log .v compilation time;
@@ -35,9 +34,9 @@ endef
 includecmdwithout@ = $(eval $(subst @,$(donewline),$(shell { $(1) | tr -d '\r' | tr '\n' '@'; })))
 $(call includecmdwithout@,$(COQBIN)coqtop -config)
 
-TIMED=
-TIMECMD=
-STDTIME?=/usr/bin/time -f "$* (user: %U mem: %M ko)"
+TIMED?=
+TIMECMD?=
+STDTIME=/usr/bin/time -f "$* (user: %U mem: %M ko)"
 TIMER=$(if $(TIMED), $(STDTIME), $(TIMECMD))
 
 vo_to_obj = $(addsuffix .o,\
@@ -51,9 +50,10 @@ vo_to_obj = $(addsuffix .o,\
 ##########################
 
 COQLIBS?=\
-  -R "." LesniewskiMereology
+  -R "." Top\
+  -I "."
 COQDOCLIBS?=\
-  -R "." LesniewskiMereology
+  -R "." Top
 
 ##########################
 #                        #
@@ -95,10 +95,18 @@ endif
 #                    #
 ######################
 
-VFILES:=mereo_core4.v\
+VFILES:=prototheticv5.v\
+  onto_mereo_v1.v\
   DOLCE_root.v
 
+ifneq ($(filter-out archclean clean cleanall printenv,$(MAKECMDGOALS)),)
 -include $(addsuffix .d,$(VFILES))
+else
+ifeq ($(MAKECMDGOALS),)
+-include $(addsuffix .d,$(VFILES))
+endif
+endif
+
 .SECONDARY: $(addsuffix .d,$(VFILES))
 
 VO=vo
@@ -179,22 +187,22 @@ userinstall:
 
 install:
 	cd "." && for i in $(VOFILES) $(VFILES) $(GLOBFILES) $(NATIVEFILES) $(CMOFILES) $(CMIFILES) $(CMAFILES); do \
-	 install -d "`dirname "$(DSTROOT)"$(COQLIBINSTALL)/LesniewskiMereology/$$i`"; \
-	 install -m 0644 $$i "$(DSTROOT)"$(COQLIBINSTALL)/LesniewskiMereology/$$i; \
+	 install -d "`dirname "$(DSTROOT)"$(COQLIBINSTALL)/Top/$$i`"; \
+	 install -m 0644 $$i "$(DSTROOT)"$(COQLIBINSTALL)/Top/$$i; \
 	done
 
 install-doc:
-	install -d "$(DSTROOT)"$(COQDOCINSTALL)/LesniewskiMereology/html
+	install -d "$(DSTROOT)"$(COQDOCINSTALL)/Top/html
 	for i in html/*; do \
-	 install -m 0644 $$i "$(DSTROOT)"$(COQDOCINSTALL)/LesniewskiMereology/$$i;\
+	 install -m 0644 $$i "$(DSTROOT)"$(COQDOCINSTALL)/Top/$$i;\
 	done
 
 uninstall_me.sh: Makefile
-	echo '#!/bin/sh' > $@ 
-	printf 'cd "$${DSTROOT}"$(COQLIBINSTALL)/LesniewskiMereology && rm -f $(VOFILES) $(VFILES) $(GLOBFILES) $(NATIVEFILES) $(CMOFILES) $(CMIFILES) $(CMAFILES) && find . -type d -and -empty -delete\ncd "$${DSTROOT}"$(COQLIBINSTALL) && find "LesniewskiMereology" -maxdepth 0 -and -empty -exec rmdir -p \{\} \;\n' >> "$@"
-	printf 'cd "$${DSTROOT}"$(COQDOCINSTALL)/LesniewskiMereology \\\n' >> "$@"
+	echo '#!/bin/sh' > $@
+	printf 'cd "$${DSTROOT}"$(COQLIBINSTALL)/Top && rm -f $(VOFILES) $(VFILES) $(GLOBFILES) $(NATIVEFILES) $(CMOFILES) $(CMIFILES) $(CMAFILES) && find . -type d -and -empty -delete\ncd "$${DSTROOT}"$(COQLIBINSTALL) && find "Top" -maxdepth 0 -and -empty -exec rmdir -p \{\} \;\n' >> "$@"
+	printf 'cd "$${DSTROOT}"$(COQDOCINSTALL)/Top \\\n' >> "$@"
 	printf '&& rm -f $(shell find "html" -maxdepth 1 -and -type f -print)\n' >> "$@"
-	printf 'cd "$${DSTROOT}"$(COQDOCINSTALL) && find LesniewskiMereology/html -maxdepth 0 -and -empty -exec rmdir -p \{\} \;\n' >> "$@"
+	printf 'cd "$${DSTROOT}"$(COQDOCINSTALL) && find Top/html -maxdepth 0 -and -empty -exec rmdir -p \{\} \;\n' >> "$@"
 	chmod +x $@
 
 uninstall: uninstall_me.sh
@@ -215,8 +223,7 @@ archclean::
 
 printenv:
 	@"$(COQBIN)coqtop" -config
-	@echo 'CAMLC =	$(CAMLC)'
-	@echo 'CAMLOPTC =	$(CAMLOPTC)'
+	@echo 'OCAMLFIND =	$(OCAMLFIND)'
 	@echo 'PP =	$(PP)'
 	@echo 'COQFLAGS =	$(COQFLAGS)'
 	@echo 'COQLIBINSTALL =	$(COQLIBINSTALL)'
