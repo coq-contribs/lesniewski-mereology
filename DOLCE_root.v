@@ -63,4 +63,5 @@ Parameter D26 : POB -> PED. Coercion D26 : POB >-> PED.
 Parameter D27 : NAPO -> POB. Coercion D27 : NAPO >-> POB.
 Parameter D28 : APO -> POB. Coercion D28 : APO >-> POB.
 
-End DOLCE_root.
+End DOLCE_root. 
+
