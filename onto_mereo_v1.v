@@ -14,6 +14,8 @@ Module Type Mereology (dolce:DOLCE_root)(proto:Protothetic dolce).
 Import dolce.
 Import proto. 
 
+Set Typeclasses Axioms Are Instances.
+
 (* ====================== ONTOLOGICAL AXIOM  ============================= *)
 
 Parameter epsilon : relation N.
